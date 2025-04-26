@@ -8,11 +8,11 @@ from functools import wraps
 app = Flask(__name__)
 
 # Configuración de la base de datos
-app.config['MYSQL_HOST'] = 'roundhouse.proxy.rlwy.net'
+app.config['MYSQL_HOST'] = 'mysql.railway.internal'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'xkYZLWFxTIPyhBNbymyiZIGWxYbLEygD'
+app.config['MYSQL_PASSWORD'] = 'jaKoonJXmFMLIqvecCgiKVIVYjBdPEfR'
 app.config['MYSQL_DB'] = 'railway'
-app.config['MYSQL_PORT'] = 37225
+app.config['MYSQL_PORT'] = 3306
 app.config['SECRET_KEY'] = 'Jhoneymi'
 
 mysql = MySQL(app)
