@@ -33,6 +33,10 @@ def token_required(f):
         return f(current_user, *args, **kwargs)
     return decorated
 
+@app.route('/')
+def index():
+    return jsonify({"message": "Welcome to the API!"})
+
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -73,19 +77,27 @@ def protected(current_user):
 @app.route('/productAdd', methods=['POST'])
 def productadd():
     data = request.get_json()
-    
+
     name = data.get('name')
     price = data.get('price')
     quantity = data.get('quantity')
     description = data.get('description')
     image_uri = data.get('image_uri')
     category = data.get('category')
-    
+
     if not all([name, price, quantity, description, image_uri, category]):
         return jsonify({'message': 'All fields are required'}), 400
 
     cursor = mysql.connection.cursor()
+
     try:
+        # Verificar si la categoría existe
+        cursor.execute("SELECT * FROM category WHERE id = %s", (category,))
+        category_exists = cursor.fetchone()
+        
+        if not category_exists:
+            return jsonify({'message': 'Category does not exist'}), 400
+        
         cursor.execute("INSERT INTO products (name, price, quantity, description, image_uri, category) VALUES (%s, %s, %s, %s, %s, %s)",
                        (name, price, quantity, description, image_uri, category))
         mysql.connection.commit()
