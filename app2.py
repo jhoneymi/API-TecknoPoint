@@ -40,20 +40,41 @@ def index():
 
 @app.route('/register', methods=['POST'])
 def register():
-    data = request.get_json()
-    username = data['username']
-    password = data['password']
-    email = data['email']
-    
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-    
-    cursor = mysql.connection.cursor()
-    cursor.execute("INSERT INTO users (username, password, email) VALUES (%s, %s, %s)", (username, hashed_password, email))
-    mysql.connection.commit()
-    cursor.close()
-    
-    return jsonify({'message': 'User registered successfully'}), 201
-
+    try:
+        data = request.get_json()
+        username = data['username']
+        password = data['password']
+        email = data['email']
+        
+        # Validación básica de datos
+        if not username or not password or not email:
+            return jsonify({'message': 'All fields are required'}), 400
+        
+        # Validar el formato del email
+        email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+        if not re.match(email_regex, email):
+            return jsonify({'message': 'Invalid email format'}), 400
+        
+        # Verificar si el usuario o email ya existe
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT * FROM users WHERE username = %s OR email = %s", (username, email))
+        existing_user = cursor.fetchone()
+        
+        if existing_user:
+            return jsonify({'message': 'Username or email already exists'}), 400
+        
+        # Hashear la contraseña
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        
+        # Insertar el nuevo usuario
+        cursor.execute("INSERT INTO users (username, password, email) VALUES (%s, %s, %s)", (username, hashed_password, email))
+        mysql.connection.commit()
+        cursor.close()
+        
+        return jsonify({'message': 'User registered successfully'}), 201
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
+        
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
