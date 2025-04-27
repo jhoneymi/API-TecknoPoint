@@ -13,7 +13,7 @@ app.config['MYSQL_HOST'] = 'turntable.proxy.rlwy.net'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'jaKoonJXmFMLIqvecCgiKVIVYjBdPEfR'
 app.config['MYSQL_DB'] = 'railway'
-app.config['MYSQL_PORT'] = 3306
+app.config['MYSQL_PORT'] = 17321
 app.config['SECRET_KEY'] = 'Jhoneymi'
 
 mysql = MySQL(app)
