@@ -81,15 +81,25 @@ def login():
     username = data['username']
     password = data['password']
     
+    # Conexión a la base de datos
     cursor = mysql.connection.cursor()
     cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
     user = cursor.fetchone()
     
-    if user and bcrypt.checkpw(password.encode('utf-8'), user[2].encode('utf-8')):
-        token = jwt.encode({'username': user[1], 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)}, app.config['SECRET_KEY'], algorithm="HS256")
-        return jsonify({'token': token})
+    if user:
+        # Verificar si el formato del hash de la contraseña es válido
+        stored_password = user[2]  # Asumiendo que user[2] es el campo de la contraseña
+
+        if stored_password and bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):
+            token = jwt.encode(
+                {'username': user[1], 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)},
+                app.config['SECRET_KEY'], algorithm="HS256"
+            )
+            return jsonify({'token': token})
+        else:
+            return make_response('Invalid credentials', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
     else:
-        return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
+        return make_response('User not found', 404)
 
 @app.route('/protected', methods=['GET'])
 @token_required
