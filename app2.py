@@ -9,7 +9,7 @@ from functools import wraps
 app = Flask(__name__)
 
 # Configuración de la base de datos
-app.config['MYSQL_HOST'] = 'mysql.railway.internal'
+app.config['MYSQL_HOST'] = 'turntable.proxy.rlwy.net'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'jaKoonJXmFMLIqvecCgiKVIVYjBdPEfR'
 app.config['MYSQL_DB'] = 'railway'
