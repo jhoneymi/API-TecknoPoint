@@ -100,7 +100,7 @@ def login():
             return make_response('Invalid credentials', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
     else:
         return make_response('User not found', 404)
-
+        
 @app.route('/protected', methods=['GET'])
 @token_required
 def protected(current_user):
