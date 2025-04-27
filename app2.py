@@ -89,7 +89,14 @@ def login():
     if user:
         # Verificar si el formato del hash de la contraseña es válido
         stored_password = user[2]  # Asumiendo que user[2] es el campo de la contraseña
-
+        
+        # Limpiar posibles saltos de línea o espacios en blanco en el hash
+        stored_password = stored_password.strip()
+        print(f"Stored password: {stored_password}")
+        print(password.encode('utf-8'))
+        print(stored_password.encode('utf-8'))
+        
+        # Comprobar si el hash de la contraseña coincide
         if stored_password and bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):
             token = jwt.encode(
                 {'username': user[1], 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)},
