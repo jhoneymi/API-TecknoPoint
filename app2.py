@@ -11,7 +11,7 @@ app = Flask(__name__)
 # Configuración de la base de datos
 app.config['MYSQL_HOST'] = 'gondola.proxy.rlwy.net'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'jaKoonJXmFMLIqvecCgiKVIVYjBdPEfR'
+app.config['MYSQL_PASSWORD'] = 'lPVSZrKrYFXXLTwasxnCLAdAYOlHnukM'
 app.config['MYSQL_DB'] = 'railway'
 app.config['MYSQL_PORT'] = 59728
 app.config['SECRET_KEY'] = 'Jhoneymi'
