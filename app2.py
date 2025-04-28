@@ -88,7 +88,7 @@ def login():
     
     if user:
         # Verificar si el formato del hash de la contraseña es válido
-        stored_password = user[2]  # Asumiendo que user[2] es el campo de la contraseña
+        stored_password = user[3]  # Asumiendo que user[2] es el campo de la contraseña
         
         # Limpiar posibles saltos de línea o espacios en blanco en el hash
         stored_password = stored_password.strip()
