@@ -199,7 +199,6 @@ def delete_product(id):
         cursor.close()
 
 @app.route('/updateproduct/<int:id>', methods=['PUT'])
-@token_required
 def update_product_quantity(current_user, id):
     data = request.get_json()
 
