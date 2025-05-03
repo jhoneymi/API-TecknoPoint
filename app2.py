@@ -355,7 +355,7 @@ def add_bill_detail():
 
         # Insertar el detalle de la factura en billdetail
         cursor.execute("""
-            INSERT INTO billdetail (bill_id, product_id, quantity, total_price)
+            INSERT INTO billdetail (id_bill, id_product, quantity, total_price)
             VALUES (%s, %s, %s, %s)
         """, (bill_id, product_id, quantity, total_price))
         mysql.connection.commit()
@@ -371,10 +371,10 @@ def get_bill_details(bill_id):
     cursor = mysql.connection.cursor()
     try:
         cursor.execute("""
-            SELECT bd.id, bd.bill_id, bd.product_id, p.name, bd.quantity, bd.total_price
+            SELECT bd.id, bd.id_bill, bd.id_product, p.name, bd.quantity, bd.total_price
             FROM billdetail bd
             JOIN products p ON bd.product_id = p.id
-            WHERE bd.bill_id = %s
+            WHERE bd.id_bill = %s
         """, (bill_id,))
         details = cursor.fetchall()
 
@@ -382,8 +382,8 @@ def get_bill_details(bill_id):
         for d in details:
             detail_list.append({
                 'id': d[0],
-                'bill_id': d[1],
-                'product_id': d[2],
+                'id_bill': d[1],
+                'id_product': d[2],
                 'product_name': d[3],
                 'quantity': d[4],
                 'total_price': float(d[5])
