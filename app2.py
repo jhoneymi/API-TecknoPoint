@@ -295,10 +295,13 @@ def addbill():
     cursor = mysql.connection.cursor()
 
     try:
+        # Aquí el number_bill es tratado como el id
         cursor.execute("INSERT INTO bills (date, number_bill, total_general) VALUES (%s, %s, %s)",
                        (date, number_bill, total_general))
         mysql.connection.commit()
-        return jsonify({'message': 'Bill added successfully'}), 201
+
+        # Se devuelve el mismo number_bill como id de la factura creada
+        return jsonify({'message': 'Bill added successfully', 'bill_id': number_bill}), 201
     except Exception as e:
         mysql.connection.rollback()
         return jsonify({'message': 'Failed to add bill', 'error': str(e)}), 500
@@ -343,8 +346,8 @@ def add_bill_detail():
     cursor = mysql.connection.cursor()
 
     try:
-        # Verificar que la factura exista
-        cursor.execute("SELECT * FROM bills WHERE id = %s", (bill_id,))
+        # Verificar que la factura exista usando el bill_id (que es el number_bill)
+        cursor.execute("SELECT * FROM bills WHERE number_bill = %s", (bill_id,))
         if cursor.fetchone() is None:
             return jsonify({'message': 'Bill not found'}), 404
 
