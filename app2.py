@@ -328,6 +328,74 @@ def getbills():
     finally:
         cursor.close()
 
+@app.route('/addbilldetail', methods=['POST'])
+def add_bill_detail():
+    data = request.get_json()
+
+    bill_id = data.get('bill_id')
+    product_id = data.get('product_id')
+    quantity = data.get('quantity')
+    total_price = data.get('total_price')
+
+    if not all([bill_id, product_id, quantity, total_price]):
+        return jsonify({'message': 'All fields are required'}), 400
+
+    cursor = mysql.connection.cursor()
+
+    try:
+        # Verificar que la factura exista
+        cursor.execute("SELECT * FROM bills WHERE id = %s", (bill_id,))
+        if cursor.fetchone() is None:
+            return jsonify({'message': 'Bill not found'}), 404
+
+        # Verificar que el producto exista
+        cursor.execute("SELECT * FROM products WHERE id = %s", (product_id,))
+        if cursor.fetchone() is None:
+            return jsonify({'message': 'Product not found'}), 404
+
+        # Insertar el detalle de la factura en billdetail
+        cursor.execute("""
+            INSERT INTO billdetail (bill_id, product_id, quantity, total_price)
+            VALUES (%s, %s, %s, %s)
+        """, (bill_id, product_id, quantity, total_price))
+        mysql.connection.commit()
+        return jsonify({'message': 'Bill detail added successfully'}), 201
+    except Exception as e:
+        mysql.connection.rollback()
+        return jsonify({'message': 'Failed to add bill detail', 'error': str(e)}), 500
+    finally:
+        cursor.close()
+
+@app.route('/getbilldetails/<int:bill_id>', methods=['GET'])
+def get_bill_details(bill_id):
+    cursor = mysql.connection.cursor()
+    try:
+        cursor.execute("""
+            SELECT bd.id, bd.bill_id, bd.product_id, p.name, bd.quantity, bd.total_price
+            FROM billdetail bd
+            JOIN products p ON bd.product_id = p.id
+            WHERE bd.bill_id = %s
+        """, (bill_id,))
+        details = cursor.fetchall()
+
+        detail_list = []
+        for d in details:
+            detail_list.append({
+                'id': d[0],
+                'bill_id': d[1],
+                'product_id': d[2],
+                'product_name': d[3],
+                'quantity': d[4],
+                'total_price': float(d[5])
+            })
+
+        return jsonify({'bill_details': detail_list}), 200
+    except Exception as e:
+        return jsonify({'message': 'Failed to retrieve bill details', 'error': str(e)}), 500
+    finally:
+        cursor.close()
+
+
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
