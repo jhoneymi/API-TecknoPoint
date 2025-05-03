@@ -373,7 +373,7 @@ def get_bill_details(bill_id):
         cursor.execute("""
             SELECT bd.id, bd.id_bill, bd.id_product, p.name, bd.quantity, bd.total_price
             FROM billdetail bd
-            JOIN products p ON bd.product_id = p.id
+            JOIN products p ON bd.id_product = p.id
             WHERE bd.id_bill = %s
         """, (bill_id,))
         details = cursor.fetchall()
