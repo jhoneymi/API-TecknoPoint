@@ -242,6 +242,53 @@ def getcategory():
     finally:
         cursor.close()
 
+@app.route('/addbill', methods=['POST'])
+def addbill():
+    data = request.get_json()
+
+    date = data.get('date')  # Esperado en formato 'YYYY-MM-DD'
+    number_bill = data.get('number_bill')
+    total_general = data.get('total_general')
+
+    if not all([date, number_bill, total_general]):
+        return jsonify({'message': 'All fields are required'}), 400
+
+    cursor = mysql.connection.cursor()
+
+    try:
+        cursor.execute("INSERT INTO bills (date, number_bill, total_general) VALUES (%s, %s, %s)",
+                       (date, number_bill, total_general))
+        mysql.connection.commit()
+        return jsonify({'message': 'Bill added successfully'}), 201
+    except Exception as e:
+        mysql.connection.rollback()
+        return jsonify({'message': 'Failed to add bill', 'error': str(e)}), 500
+    finally:
+        cursor.close()
+
+@app.route('/getbills', methods=['GET'])
+def getbills():
+    cursor = mysql.connection.cursor()
+    try:
+        cursor.execute("SELECT * FROM bills")
+        bills = cursor.fetchall()
+
+        bill_list = []
+        for bill in bills:
+            bill_dict = {
+                'id': bill[0],
+                'date': bill[1].strftime('%Y-%m-%d') if isinstance(bill[1], datetime.date) else str(bill[1]),
+                'number_bill': bill[2],
+                'total_general': float(bill[3])
+            }
+            bill_list.append(bill_dict)
+
+        return jsonify({'bills': bill_list}), 200
+    except Exception as e:
+        return jsonify({'message': 'Failed to retrieve bills', 'error': str(e)}), 500
+    finally:
+        cursor.close()
+
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
