@@ -198,6 +198,46 @@ def delete_product(id):
     finally:
         cursor.close()
 
+@app.route('/updateproduct/<int:id>', methods=['PUT'])
+@token_required
+def update_product_quantity(current_user, id):
+    data = request.get_json()
+
+    # Obtener el nuevo valor de la cantidad
+    quantity = data.get('quantity')
+
+    # Verificar que la cantidad esté presente y sea válida
+    if quantity is None or not isinstance(quantity, int) or quantity < 0:
+        return jsonify({'message': 'Valid quantity is required'}), 400
+
+    cursor = mysql.connection.cursor()
+
+    try:
+        # Verificar si el producto existe
+        cursor.execute("SELECT * FROM products WHERE id = %s", (id,))
+        product = cursor.fetchone()
+
+        if product is None:
+            return jsonify({'message': 'Product not found'}), 404
+
+        # Actualizar la cantidad del producto
+        cursor.execute("""
+            UPDATE products
+            SET quantity = %s
+            WHERE id = %s
+        """, (quantity, id))
+        mysql.connection.commit()
+
+        return jsonify({'message': 'Product quantity updated successfully'}), 200
+
+    except Exception as e:
+        mysql.connection.rollback()
+        return jsonify({'message': 'Failed to update product quantity', 'error': str(e)}), 500
+
+    finally:
+        cursor.close()
+
+
 @app.route('/addcategory', methods=['POST'])
 def addcategory():
     data = request.get_json()
