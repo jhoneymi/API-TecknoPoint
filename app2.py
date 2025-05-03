@@ -199,7 +199,7 @@ def delete_product(id):
         cursor.close()
 
 @app.route('/updateproduct/<int:id>', methods=['PUT'])
-def update_product_quantity(current_user, id):
+def update_product_quantity(id):
     data = request.get_json()
 
     # Obtener el nuevo valor de la cantidad
